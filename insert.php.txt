@@ -1,0 +1,53 @@
+<?php
+echo $_SERVER['HTTP_USER_AGENT'] . "\n\n";
+$browser = get_browser(null,true);
+print_r($browser);
+?>
+<?php
+ $username =$_POST['username'];
+ $email =$_POST['email'];
+ $password =$_POST['password'];
+ $psw-repeat =$POST['psw-repeat'];
+
+ if (!empty($username) || !empty($password) || !empty($email) || !empty($psw-repeat)){
+    $host = "localhost";
+    $dbUsername = "REGISTER";
+    $dbPassword = "Kis@bei2016";
+    $dbname = "register";
+
+    //create connection
+    $conn = new mysqli($host,$dbUsername,dbPassword,dbname);
+
+    if (mysqli_connect_error()){
+         die("Connect Error(".mysqli_connect_errno().")".mysqli_connect_error());
+    } else{
+        $SELECT = "SELECT email From register Where email = ? Limit 1";
+        $INSERT = "INSERT Into login (username,email,password,psw-repeat) values(?,?,?,?)";  
+ 
+
+      //prepare staement
+      $stmt = $conn->prepare($SELECT);
+      $stmt->bind_param("s", $email);
+      $stmt->execute();
+      $stmt->bind_result($email);
+      $stmt->store_result();
+      $rnum =$stmt->num_rows;
+
+      if ($rnum==0) {
+          $stmt->close();
+
+          $stmt = $conn->prepare($INSERT);
+          $stmt->bind_param("ssss",$username,$email,$password,$psw-repeat);
+          $stmt->execute();
+           echo"New record inserted successfully";
+      }else{
+           echo "Someone already register using this email";
+      }
+      $stmt->close();
+      $conn->close();
+     }
+  }else{
+     echo "All field are required";
+     die();
+  }
+ ?>
